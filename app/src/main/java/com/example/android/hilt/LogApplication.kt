@@ -17,7 +17,15 @@
 package com.example.android.hilt
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
+// Add a +container+ that is attached to the app's lifecycle.
+// A Base Class (like +MyApplication+) can use DI.
+// The +application container+ is parent container of the application.
+// This means that other containers can access the dependencies that
+// this application container provides.
+//
+@HiltAndroidApp
 class LogApplication : Application() {
 
     lateinit var serviceLocator: ServiceLocator
