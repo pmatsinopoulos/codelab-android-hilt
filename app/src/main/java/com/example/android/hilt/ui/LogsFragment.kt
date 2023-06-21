@@ -17,7 +17,6 @@
 package com.example.android.hilt.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,19 +24,49 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.example.android.hilt.LogApplication
 import com.example.android.hilt.R
 import com.example.android.hilt.data.Log
 import com.example.android.hilt.data.LoggerLocalDataSource
 import com.example.android.hilt.util.DateFormatter
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * Fragment that displays the database logs.
+ *
+ * +logger+ and +dateFormatter+ are two dependencies that
+ * come from the +serviceLocator+ of the main application instance
+ * i.e. +context.applicationContext as LogApplication+
+ *
+ * We use +@AndroidEntryPoint+ to ask +Hilt+ to inject these
+ * dependencies and manage their lifecycle. This will create
+ * a dependencies container that follows the Android
+ * LogsFragment (Fragment) lifecycle.
  */
+@AndroidEntryPoint
 class LogsFragment : Fragment() {
 
-    private lateinit var logger: LoggerLocalDataSource
-    private lateinit var dateFormatter: DateFormatter
+    /**
+     * This is how we can reference fields that are injected by Hilt.
+     * But how Hilt knows how to provide instances of these classes?
+     * i.e. of +LoggerLocalDataSource+ and +DateFormatter+. Look at these
+     * classes source code to find out how.
+     *
+     * Note that this is called _field injection_.
+     *
+     * However, the +logger: LoggerLocalDataSource+ is a special
+     * case because for the same instance of +serviceLocator+
+     * the +serviceLocator.loggerLocalDataSource+ is the same
+     * instance. It's not a new instance. This means that the
+     * dependency instance is _scoped to the application container+, i.e.
+     * the dependency instance is _scoped to the serviceLocator+.
+     * How can we do that with +Hilt+?
+     * We use _scoping annotations_. See the +LoggerLocalDataSource+
+     * annotation +@Singleton+.
+     * Note: for other Component Scopes read this: https://developer.android.com/training/dependency-injection/hilt-android#component-scopes
+     */
+    @Inject lateinit var logger: LoggerLocalDataSource
+    @Inject lateinit var dateFormatter: DateFormatter
 
     private lateinit var recyclerView: RecyclerView
 
@@ -55,6 +84,10 @@ class LogsFragment : Fragment() {
         }
     }
 
+    /**
+     * We remove the code below, because it is not needed anymore
+     */
+    /* removed thanks to Hilt
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
@@ -66,7 +99,7 @@ class LogsFragment : Fragment() {
         dateFormatter =
             (context.applicationContext as LogApplication).serviceLocator.provideDateFormatter()
     }
-
+    */
     override fun onResume() {
         super.onResume()
 

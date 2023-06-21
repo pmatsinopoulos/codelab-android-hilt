@@ -20,11 +20,31 @@ import android.os.Handler
 import android.os.Looper
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Data manager class that handles data manipulation between the database and the UI.
+ *
+ * The +@Inject+ is telling +Hilt+ how to build new
+ * instances of this class, when this class is a +Hilt+
+ * dependency. This is also called +Hilt binding+.
+ *
+ * The +Singleton+ annotation (which is a scope annotation)
+ * tells +Hilt+ application container to return the same
+ * dependency instance for the same application container instance.
+ * Note: for other Component Scopes read this: https://developer.android.com/training/dependency-injection/hilt-android#component-scopes
+ *
+ * The other problem that we have to soft ous is the transitive
+ * dependency to +LogDao+. The +LogDao+ is an +Interface+, hence
+ * it does have a +constructor+ to apply +@Inject+. In order to solve
+ * this problem, we will use Hilt Modules, which is a special API/tool
+ * that allows us to define _bindings_ i.e. a way for Hilt to know ho
+ * to provide instances of types. Look at the package +di+ and the file
+ * +DatabaseModule.kt+.
  */
-class LoggerLocalDataSource(private val logDao: LogDao) {
+@Singleton
+class LoggerLocalDataSource @Inject constructor(private val logDao: LogDao) {
 
     private val executorService: ExecutorService = Executors.newFixedThreadPool(4)
     private val mainThreadHandler by lazy {
