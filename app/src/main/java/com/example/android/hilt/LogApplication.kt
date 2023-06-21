@@ -26,12 +26,5 @@ import dagger.hilt.android.HiltAndroidApp
 // this application container provides.
 //
 @HiltAndroidApp
-class LogApplication : Application() {
+class LogApplication : Application()
 
-    lateinit var serviceLocator: ServiceLocator
-
-    override fun onCreate() {
-        super.onCreate()
-        serviceLocator = ServiceLocator(applicationContext)
-    }
-}
